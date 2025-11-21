@@ -7,10 +7,19 @@ WORKDIR /app
 # Copy the Maven pom.xml and source code
 COPY pom.xml .
 COPY src ./src
+# ADD THE MAVEN WRAPPER FILES (mvnw and mvnw.cmd)
+COPY mvnw .
+COPY .mvn .mvn
 
-# Build the application using Maven. The '-DskipTests' flag skips running tests.
-# The 'clean package' command creates the final JAR file in 'target/'
+# --- FIX IS HERE ---
+# Grant executable permissions to the Maven Wrapper script
+RUN chmod +x ./mvnw
+
+# Build the application using Maven.
 RUN ./mvnw clean package -DskipTests
+
+# --- 2. RUNTIME STAGE ---
+# ... (rest of the Dockerfile remains the same)
 
 # --- 2. RUNTIME STAGE ---
 # Use a lightweight JRE image for the final runtime environment
