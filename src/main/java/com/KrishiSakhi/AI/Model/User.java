@@ -23,4 +23,6 @@ public class User {
     // One-to-One mapping to FarmProfile once created
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private FarmProfile farmProfile;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
 }

@@ -173,4 +173,35 @@ public class UserService implements UserDetailsService {
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+    @Transactional
+    public void deleteUser(Long userId) throws RuntimeException {
+
+        // Spring Data JPA's deleteById is used, which is highly efficient.
+        // However, it relies on the entity relationship (cascade) to clean up linked data.
+
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User with ID " + userId + " not found.");
+        }
+
+        userRepository.deleteById(userId);
+    }
+
+    @Transactional
+    public User updateUsername(String authenticatedUsername, String newUsername) throws Exception {
+
+        // 1. Check for availability of the new username
+        if (userRepository.findByUsername(newUsername).isPresent()) {
+            throw new IllegalArgumentException("Username '" + newUsername + "' is already taken.");
+        }
+
+        // 2. Retrieve the currently authenticated user
+        User user = userRepository.findByUsername(authenticatedUsername)
+                .orElseThrow(() -> new RuntimeException("Authenticated user profile not found."));
+
+        // 3. Update the username
+        user.setUsername(newUsername);
+
+        // 4. Save and return the updated user (This operation is transactional)
+        return userRepository.save(user);
+    }
 }
